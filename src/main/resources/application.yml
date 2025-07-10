@@ -1,0 +1,21 @@
+server:
+  port: 8084
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/authdb
+    username: postgres
+    password: admin
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+auth:
+  jwt:
+    private-key: classpath:private.pem
+    public-key: classpath:public.pem
+    expirationMs: 900000
+    refreshExpirationMs: 86400000
