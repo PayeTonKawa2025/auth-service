@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.Files;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -37,13 +36,13 @@ public class JwtService {
 
     @PostConstruct
     public void loadKeys() throws Exception {
-        // Lecture du PEM texte
-        String privateKeyContent = Files.readString(privateKeyResource.getFile().toPath())
+        // Lecture via InputStream (compatible avec un JAR)
+        String privateKeyContent = new String(privateKeyResource.getInputStream().readAllBytes())
                 .replace("-----BEGIN PRIVATE KEY-----", "")
                 .replace("-----END PRIVATE KEY-----", "")
                 .replaceAll("\\s", "");
 
-        String publicKeyContent = Files.readString(publicKeyResource.getFile().toPath())
+        String publicKeyContent = new String(publicKeyResource.getInputStream().readAllBytes())
                 .replace("-----BEGIN PUBLIC KEY-----", "")
                 .replace("-----END PUBLIC KEY-----", "")
                 .replaceAll("\\s", "");
