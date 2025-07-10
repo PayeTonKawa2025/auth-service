@@ -32,4 +32,10 @@ build/
 ### VS Code ###
 .vscode/
 
-.resources/application.yml
+# RSA keys
+src/main/resources/private.pem
+
+# Secrets & config locales
+.env
+
+application.yml

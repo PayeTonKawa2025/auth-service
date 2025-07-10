@@ -1,4 +1,5 @@
 package org.payetonkawa.auth.auth_service.repository;
+
 import org.payetonkawa.auth.auth_service.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -4,8 +4,8 @@ server:
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5433/authdb
-    username: postgres
-    password: admin
+    username: your_db_user
+    password: your_db_password
   jpa:
     hibernate:
       ddl-auto: update
@@ -17,5 +17,5 @@ auth:
   jwt:
     private-key: classpath:private.pem
     public-key: classpath:public.pem
-    expirationMs: 900000
-    refreshExpirationMs: 86400000
+    expirationMs: 900000           # 15 minutes
+    refreshExpirationMs: 86400000 # 24 heures
