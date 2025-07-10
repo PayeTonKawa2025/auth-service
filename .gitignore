@@ -38,4 +38,6 @@ src/main/resources/private.pem
 # Secrets & config locales
 .env
 
-application.yml
+# Ignorer le fichier de config sensible
+src/main/resources/application.yml
+
