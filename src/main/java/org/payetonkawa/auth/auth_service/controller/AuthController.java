@@ -47,10 +47,10 @@ public class AuthController {
         String refreshToken = authService.generateRefreshToken(req.email());
 
         ResponseCookie accessCookie = ResponseCookie.from("access_token", accessToken)
-                .httpOnly(true).secure(true).sameSite("Strict").path("/").maxAge(900).build();
+                .httpOnly(true).secure(false).sameSite("Strict").path("/").maxAge(900).build();
 
         ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken)
-                .httpOnly(true).secure(true).sameSite("Strict").path("/").maxAge(86400).build();
+                .httpOnly(true).secure(false).sameSite("Strict").path("/").maxAge(86400).build();
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, accessCookie.toString(), refreshCookie.toString())
@@ -67,7 +67,7 @@ public class AuthController {
         String newAccessToken = authService.generateAccessToken(email);
 
         ResponseCookie newAccessCookie = ResponseCookie.from("access_token", newAccessToken)
-                .httpOnly(true).secure(true).sameSite("Strict").path("/").maxAge(900).build();
+                .httpOnly(true).secure(false).sameSite("Strict").path("/").maxAge(900).build();
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, newAccessCookie.toString())
@@ -77,10 +77,10 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {
         ResponseCookie expiredAccess = ResponseCookie.from("access_token", "")
-                .httpOnly(true).secure(true).sameSite("Strict").path("/").maxAge(0).build();
+                .httpOnly(true).secure(false).sameSite("Strict").path("/").maxAge(0).build();
 
         ResponseCookie expiredRefresh = ResponseCookie.from("refresh_token", "")
-                .httpOnly(true).secure(true).sameSite("Strict").path("/").maxAge(0).build();
+                .httpOnly(true).secure(false).sameSite("Strict").path("/").maxAge(0).build();
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, expiredAccess.toString(), expiredRefresh.toString())
