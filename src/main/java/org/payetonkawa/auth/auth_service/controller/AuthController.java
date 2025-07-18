@@ -10,8 +10,10 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("api/auth")
 public class AuthController {
 
     private final AuthService authService;
@@ -86,4 +88,29 @@ public class AuthController {
                 .header(HttpHeaders.SET_COOKIE, expiredAccess.toString(), expiredRefresh.toString())
                 .body("Logout OK");
     }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> me(@CookieValue(name = "access_token", required = false) String token) {
+        if (token == null || !authService.validateToken(token)) {
+            return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
+        }
+
+        String email = authService.extractEmailFromToken(token);
+        var optionalUser = authService.findByEmail(email);
+
+        if (optionalUser.isEmpty()) {
+            return ResponseEntity.status(404).body(Map.of("error", "User not found"));
+        }
+
+        User user = optionalUser.get();
+        Map<String, Object> userInfo = Map.of(
+                "id", user.getId(),
+                "email", user.getEmail(),
+                "firstname", user.getFirstName(),
+                "lastname", user.getLastName()
+        );
+
+        return ResponseEntity.ok(userInfo);
+    }
+
 }
