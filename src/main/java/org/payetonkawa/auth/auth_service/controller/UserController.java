@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("api/auth/users")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -18,6 +18,16 @@ public class UserController {
     @GetMapping
     public ResponseEntity<List<User>> getAll() {
         return ResponseEntity.ok(service.findAll());
+    }
+
+    @PostMapping
+
+    public ResponseEntity<User> create(@RequestBody User user) {
+        if (user.getEmail() == null || user.getPassword() == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        User createdUser = service.create(user);
+        return ResponseEntity.status(201).body(createdUser);
     }
 
     @GetMapping("/{id}")

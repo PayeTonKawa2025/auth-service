@@ -36,4 +36,11 @@ public class UserService {
         repo.deleteById(id);
         return true;
     }
+
+    public User create(User user) {
+        if (user.getEmail() == null || user.getPassword() == null) {
+            throw new IllegalArgumentException("Email and password must not be null");
+        }
+        return repo.save(user);
+    }
 }
