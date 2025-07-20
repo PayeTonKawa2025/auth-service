@@ -26,13 +26,13 @@ public class JwtService {
     private Resource publicKeyResource;
 
     @Value("${auth.jwt.expirationMs}")
-    private int jwtExpirationMs;
+    int jwtExpirationMs;
 
     @Value("${auth.jwt.refreshExpirationMs}")
-    private int refreshExpirationMs;
+    int refreshExpirationMs;
 
-    private PrivateKey privateKey;
-    private PublicKey publicKey;
+    PrivateKey privateKey;
+    PublicKey publicKey;
 
     @PostConstruct
     public void loadKeys() throws Exception {
