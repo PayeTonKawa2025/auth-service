@@ -16,6 +16,14 @@ jobs:
           echo "${{ secrets.PRIVATE_KEY }}" > src/main/resources/private.pem
           echo "${{ secrets.PUBLIC_KEY }}" > src/main/resources/public.pem
 
+      - name: Vérifier présence des clés PEM
+        run: |
+          echo "Contenu de src/main/resources :"
+          ls -l src/main/resources
+          echo "Contenu du fichier private.pem :"
+          cat src/main/resources/private.pem || echo "Fichier private.pem introuvable"
+      
+
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
