@@ -11,6 +11,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Inject keys
+        run: |
+          echo "${{ secrets.PRIVATE_KEY }}" > src/main/resources/private.pem
+          echo "${{ secrets.PUBLIC_KEY }}" > src/main/resources/public.pem
+
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
