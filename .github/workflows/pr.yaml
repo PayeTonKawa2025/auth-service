@@ -38,7 +38,7 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
       - name: Build and run tests
-        run: mvn clean verify
+        run: mvn clean install -Dspring.profiles.active=dev
 
   sonar:
     runs-on: ubuntu-latest
