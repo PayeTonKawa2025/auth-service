@@ -34,6 +34,7 @@ build/
 
 # RSA keys
 src/main/resources/private.pem
+src/main/resources/public.pem
 
 # Secrets & config locales
 .env
