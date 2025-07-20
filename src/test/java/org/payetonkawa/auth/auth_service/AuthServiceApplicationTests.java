@@ -7,7 +7,7 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest (
 		classes = AuthServiceApplication.class
 )
-@ActiveProfiles("dev")
+@ActiveProfiles("test")
 public class AuthServiceApplicationTests {
 
 	@Test
