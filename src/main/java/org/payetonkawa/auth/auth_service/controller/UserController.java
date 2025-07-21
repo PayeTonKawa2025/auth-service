@@ -50,4 +50,22 @@ public class UserController {
                 ? ResponseEntity.noContent().build()
                 : ResponseEntity.notFound().build();
     }
+
+    @PutMapping("/{userId}/roles")
+    public ResponseEntity<?> updateUserRoles(
+            @PathVariable Long userId,
+            @RequestBody List<String> roleNames) {
+        try {
+            service.updateUserRoles(userId, roleNames);
+            return ResponseEntity.ok("User roles updated successfully");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/{userId}/roles")
+    public ResponseEntity<?> getUserRoles(@PathVariable Long userId) {
+        return ResponseEntity.ok(service.getUserRoles(userId));
+    }
+
 }

@@ -2,17 +2,22 @@ package org.payetonkawa.auth.auth_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.payetonkawa.auth.auth_service.model.User;
+import org.payetonkawa.auth.auth_service.model.Role;
 import org.payetonkawa.auth.auth_service.repository.UserRepository;
+import org.payetonkawa.auth.auth_service.repository.RoleRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository repo;
+    private final RoleRepository roleRepository;
 
     public List<User> findAll() {
         return repo.findAll();
@@ -43,4 +48,24 @@ public class UserService {
         }
         return repo.save(user);
     }
+
+    public void updateUserRoles(Long userId, List<String> roleNames) {
+        User user = repo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Set<Role> roles = roleNames.stream()
+                .map(roleName -> roleRepository.findByName(roleName)
+                        .orElseThrow(() -> new RuntimeException("Role " + roleName + " not found")))
+                .collect(Collectors.toSet());
+
+        user.setRoles(roles);
+        repo.save(user);
+    }
+
+    public Set<String> getUserRoles(Long userId) {
+        User user = repo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return user.getRoles().stream().map(Role::getName).collect(Collectors.toSet());
+    }
+
 }
