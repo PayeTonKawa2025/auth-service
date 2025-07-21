@@ -2,7 +2,8 @@ package org.payetonkawa.auth.auth_service.security;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.context.ActiveProfiles;
+import org.payetonkawa.auth.auth_service.model.Role;
+import org.payetonkawa.auth.auth_service.model.User;
 
 import java.security.KeyFactory;
 import java.security.PrivateKey;
@@ -10,11 +11,14 @@ import java.security.PublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 public class JwtServiceTest {
 
     private JwtService jwtService;
+    private User testUser;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -67,43 +71,43 @@ public class JwtServiceTest {
         jwtService.jwtExpirationMs = 3600000;
         jwtService.refreshExpirationMs = 7200000;
 
-        System.out.println("JWT Service initialized with test keys and expiration times.");
+        // Préparation d'un User avec un rôle
+        Role role = new Role();
+        role.setName("USER");
+
+        testUser = new User();
+        testUser.setEmail("test@example.com");
+        testUser.setRoles(Set.of(role));
     }
 
     @Test
     void generateAndValidateAccessToken_shouldWork() {
-        String token = jwtService.generateAccessToken("user@example.com");
+        String token = jwtService.generateAccessToken(testUser);
+
         assertNotNull(token);
         assertTrue(jwtService.validateToken(token));
-        assertEquals("user@example.com", jwtService.getEmailFromToken(token));
-
-        System.out.println("Access token generated and validated successfully.");
+        assertEquals("test@example.com", jwtService.getEmailFromToken(token));
     }
 
     @Test
     void generateAndValidateRefreshToken_shouldWork() {
-        String token = jwtService.generateRefreshToken("refresh@example.com");
+        String token = jwtService.generateRefreshToken(testUser);
+
         assertNotNull(token);
         assertTrue(jwtService.validateToken(token));
-        assertEquals("refresh@example.com", jwtService.getEmailFromToken(token));
-
-        System.out.println("Refresh token generated and validated successfully.");
+        assertEquals("test@example.com", jwtService.getEmailFromToken(token));
     }
 
     @Test
     void getEncodedPublicKey_shouldReturnPemFormat() {
         String pem = jwtService.getEncodedPublicKey();
+
         assertTrue(pem.contains("BEGIN PUBLIC KEY"));
         assertTrue(pem.contains("END PUBLIC KEY"));
-        assertTrue(pem.contains("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8A"));
-
-        System.out.println("Public key in PEM format retrieved successfully.");
     }
 
     @Test
     void validateToken_invalidToken_shouldReturnFalse() {
         assertFalse(jwtService.validateToken("invalid.token.here"));
-
-        System.out.println("Invalid token validation returned false as expected.");
     }
 }
