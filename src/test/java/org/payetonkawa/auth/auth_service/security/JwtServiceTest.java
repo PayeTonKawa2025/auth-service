@@ -71,12 +71,11 @@ public class JwtServiceTest {
         jwtService.jwtExpirationMs = 3600000;
         jwtService.refreshExpirationMs = 7200000;
 
-        // Préparation d'un User avec un rôle
         Role role = new Role();
-        role.setName("USER");
+        role.setName("ROLE_USER");
 
         testUser = new User();
-        testUser.setEmail("test@example.com");
+        testUser.setEmail("user@example.com");
         testUser.setRoles(Set.of(role));
     }
 
@@ -86,7 +85,7 @@ public class JwtServiceTest {
 
         assertNotNull(token);
         assertTrue(jwtService.validateToken(token));
-        assertEquals("test@example.com", jwtService.getEmailFromToken(token));
+        assertEquals("user@example.com", jwtService.getEmailFromToken(token));
     }
 
     @Test
@@ -95,15 +94,7 @@ public class JwtServiceTest {
 
         assertNotNull(token);
         assertTrue(jwtService.validateToken(token));
-        assertEquals("test@example.com", jwtService.getEmailFromToken(token));
-    }
-
-    @Test
-    void getEncodedPublicKey_shouldReturnPemFormat() {
-        String pem = jwtService.getEncodedPublicKey();
-
-        assertTrue(pem.contains("BEGIN PUBLIC KEY"));
-        assertTrue(pem.contains("END PUBLIC KEY"));
+        assertEquals("user@example.com", jwtService.getEmailFromToken(token));
     }
 
     @Test

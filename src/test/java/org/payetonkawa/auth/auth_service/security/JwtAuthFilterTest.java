@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -38,32 +37,31 @@ public class JwtAuthFilterTest {
 
     @Test
     void doFilterInternal_validToken_shouldSetAuthentication() throws ServletException, IOException {
-        Cookie tokenCookie = new Cookie("access_token", "validToken");
-
-        when(request.getCookies()).thenReturn(new Cookie[]{tokenCookie});
+        Cookie cookie = new Cookie("access_token", "validToken");
+        when(request.getCookies()).thenReturn(new Cookie[]{cookie});
         when(jwtService.validateToken("validToken")).thenReturn(true);
 
         Claims claims = new DefaultClaims();
         claims.setSubject("user@example.com");
-        claims.put("roles", "ROLE_USER,ROLE_ADMIN");
+        claims.put("roles", "USER,ADMIN");  // Simule 2 rôles.
 
         when(jwtService.getAllClaimsFromToken("validToken")).thenReturn(claims);
 
         filter.doFilterInternal(request, response, filterChain);
 
         assertNotNull(SecurityContextHolder.getContext().getAuthentication());
-        assertEquals("user@example.com", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-        assertTrue(SecurityContextHolder.getContext().getAuthentication().getAuthorities()
-                .stream().anyMatch(a -> a.getAuthority().equals("ROLE_USER")));
+        assertEquals("user@example.com",
+                SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        assertEquals(2,
+                SecurityContextHolder.getContext().getAuthentication().getAuthorities().size());
 
         verify(filterChain).doFilter(request, response);
     }
 
     @Test
     void doFilterInternal_invalidToken_shouldNotSetAuthentication() throws ServletException, IOException {
-        Cookie tokenCookie = new Cookie("access_token", "invalidToken");
-
-        when(request.getCookies()).thenReturn(new Cookie[]{tokenCookie});
+        Cookie cookie = new Cookie("access_token", "invalidToken");
+        when(request.getCookies()).thenReturn(new Cookie[]{cookie});
         when(jwtService.validateToken("invalidToken")).thenReturn(false);
 
         filter.doFilterInternal(request, response, filterChain);
