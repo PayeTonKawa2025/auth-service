@@ -1,5 +1,7 @@
 package org.payetonkawa.auth.auth_service.security;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.impl.DefaultClaims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -8,7 +10,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.io.IOException;
 
@@ -19,7 +20,6 @@ public class JwtAuthFilterTest {
 
     private JwtService jwtService;
     private JwtAuthFilter filter;
-
     private HttpServletRequest request;
     private HttpServletResponse response;
     private FilterChain filterChain;
@@ -37,25 +37,30 @@ public class JwtAuthFilterTest {
     }
 
     @Test
-    void doFilterInternal_validToken_setsAuthentication() throws ServletException, IOException {
+    void doFilterInternal_validToken_shouldSetAuthentication() throws ServletException, IOException {
         Cookie tokenCookie = new Cookie("access_token", "validToken");
 
         when(request.getCookies()).thenReturn(new Cookie[]{tokenCookie});
         when(jwtService.validateToken("validToken")).thenReturn(true);
-        when(jwtService.getEmailFromToken("validToken")).thenReturn("user@example.com");
+
+        Claims claims = new DefaultClaims();
+        claims.setSubject("user@example.com");
+        claims.put("roles", "ROLE_USER,ROLE_ADMIN");
+
+        when(jwtService.getAllClaimsFromToken("validToken")).thenReturn(claims);
 
         filter.doFilterInternal(request, response, filterChain);
 
         assertNotNull(SecurityContextHolder.getContext().getAuthentication());
         assertEquals("user@example.com", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        assertTrue(SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+                .stream().anyMatch(a -> a.getAuthority().equals("ROLE_USER")));
 
         verify(filterChain).doFilter(request, response);
-
-        System.out.print("Filter executed with valid token, authentication set.\n");
     }
 
     @Test
-    void doFilterInternal_invalidToken_noAuthentication() throws ServletException, IOException {
+    void doFilterInternal_invalidToken_shouldNotSetAuthentication() throws ServletException, IOException {
         Cookie tokenCookie = new Cookie("access_token", "invalidToken");
 
         when(request.getCookies()).thenReturn(new Cookie[]{tokenCookie});
@@ -65,19 +70,15 @@ public class JwtAuthFilterTest {
 
         assertNull(SecurityContextHolder.getContext().getAuthentication());
         verify(filterChain).doFilter(request, response);
-
-        System.out.print("Filter executed with invalid token, no authentication set.\n");
     }
 
     @Test
-    void doFilterInternal_noToken_noAuthentication() throws ServletException, IOException {
+    void doFilterInternal_noToken_shouldNotSetAuthentication() throws ServletException, IOException {
         when(request.getCookies()).thenReturn(null);
 
         filter.doFilterInternal(request, response, filterChain);
 
         assertNull(SecurityContextHolder.getContext().getAuthentication());
         verify(filterChain).doFilter(request, response);
-
-        System.out.print("Filter executed without token, no authentication set.\n");
     }
 }
