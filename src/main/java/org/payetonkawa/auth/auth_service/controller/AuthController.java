@@ -3,6 +3,7 @@ package org.payetonkawa.auth.auth_service.controller;
 import jakarta.validation.Valid;
 import org.payetonkawa.auth.auth_service.dto.LoginRequest;
 import org.payetonkawa.auth.auth_service.dto.RegisterRequest;
+import org.payetonkawa.auth.auth_service.dto.UserProfileResponse;
 import org.payetonkawa.auth.auth_service.model.User;
 import org.payetonkawa.auth.auth_service.service.AuthService;
 import org.springframework.http.HttpHeaders;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping("api/auth")
@@ -34,6 +36,9 @@ public class AuthController {
         user.setLastName(req.lastName());
         user.setPassword(req.password());
 
+        // Affecter le rôle par défaut USER
+        user.setRoles(Set.of(authService.getDefaultUserRole()));
+
         authService.register(user);
         return ResponseEntity.ok("User registered");
     }
@@ -45,8 +50,8 @@ public class AuthController {
             return ResponseEntity.badRequest().body("Invalid credentials");
         }
 
-        String accessToken = authService.generateAccessToken(req.email());
-        String refreshToken = authService.generateRefreshToken(req.email());
+        String accessToken = authService.generateAccessToken(opt.get());
+        String refreshToken = authService.generateRefreshToken(opt.get());
 
         ResponseCookie accessCookie = ResponseCookie.from("access_token", accessToken)
                 .httpOnly(true).secure(false).sameSite("Strict").path("/").maxAge(900).build();
@@ -66,7 +71,7 @@ public class AuthController {
         }
 
         String email = authService.extractEmailFromToken(token);
-        String newAccessToken = authService.generateAccessToken(email);
+        String newAccessToken = authService.generateAccessToken(authService.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found")));
 
         ResponseCookie newAccessCookie = ResponseCookie.from("access_token", newAccessToken)
                 .httpOnly(true).secure(false).sameSite("Strict").path("/").maxAge(900).build();
@@ -103,14 +108,23 @@ public class AuthController {
         }
 
         User user = optionalUser.get();
-        Map<String, Object> userInfo = Map.of(
-                "id", user.getId(),
-                "email", user.getEmail(),
-                "firstname", user.getFirstName(),
-                "lastname", user.getLastName()
+
+        // Gestion du rôle : si plusieurs rôles, prends le premier (à adapter selon le besoin)
+        String role = user.getRoles().stream()
+                .findFirst()
+                .map(r -> r.getName())
+                .orElse("UNKNOWN");
+
+        UserProfileResponse response = new UserProfileResponse(
+                user.getId(),
+                user.getEmail(),
+                user.getFirstName(),
+                user.getLastName(),
+                role
         );
 
-        return ResponseEntity.ok(userInfo);
+        return ResponseEntity.ok(response);
     }
+
 
 }

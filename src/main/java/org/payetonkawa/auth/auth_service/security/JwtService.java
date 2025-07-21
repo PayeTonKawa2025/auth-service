@@ -1,9 +1,13 @@
 package org.payetonkawa.auth.auth_service.security;
 
+import io.jsonwebtoken.Claims;
 import jakarta.annotation.PostConstruct;
+import org.payetonkawa.auth.auth_service.model.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.payetonkawa.auth.auth_service.model.Role;
+import org.slf4j.Logger;
 
 import java.security.KeyFactory;
 import java.security.PrivateKey;
@@ -12,12 +16,15 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 @Service
 public class JwtService {
+
+    private static final Logger Logger = org.slf4j.LoggerFactory.getLogger(JwtService.class);
 
     @Value("${auth.jwt.private-key}")
     private Resource privateKeyResource;
@@ -55,18 +62,28 @@ public class JwtService {
         publicKey = kf.generatePublic(new X509EncodedKeySpec(publicBytes));
     }
 
-    public String generateAccessToken(String email) {
+    public String generateAccessToken(User user) {
+        String roles = user.getRoles().stream()
+                .map(Role::getName)
+                .collect(Collectors.joining(","));
+
         return Jwts.builder()
-                .setSubject(email)
+                .setSubject(user.getEmail())
+                .claim("roles", roles)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(privateKey, SignatureAlgorithm.RS256)
                 .compact();
     }
 
-    public String generateRefreshToken(String email) {
+
+    public String generateRefreshToken(User user) {
+        String roles = user.getRoles().stream()
+                .map(Role::getName)
+                .collect(Collectors.joining(","));
         return Jwts.builder()
-                .setSubject(email)
+                .setSubject(user.getEmail())
+                .claim("roles", roles)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + refreshExpirationMs))
                 .signWith(privateKey, SignatureAlgorithm.RS256)
@@ -81,6 +98,8 @@ public class JwtService {
                     .parseClaimsJws(token);
             return true;
         } catch (Exception e) {
+            // Log the exception if needed
+            Logger.warn("JWT validation failed: " + e.getMessage());
             return false;
         }
     }
@@ -99,4 +118,13 @@ public class JwtService {
                 Base64.getEncoder().encodeToString(publicKey.getEncoded()) +
                 "\n-----END PUBLIC KEY-----";
     }
+
+    public Claims getAllClaimsFromToken(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(publicKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
 }

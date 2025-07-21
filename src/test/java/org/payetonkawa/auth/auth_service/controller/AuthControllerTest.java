@@ -2,15 +2,12 @@ package org.payetonkawa.auth.auth_service.controller;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
+import org.payetonkawa.auth.auth_service.model.Role;
 import org.payetonkawa.auth.auth_service.model.User;
 import org.payetonkawa.auth.auth_service.service.AuthService;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithAnonymousUser;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -45,14 +42,18 @@ public class AuthControllerTest {
     void register_userOk_shouldReturn200() throws Exception {
         when(authService.findByEmail("test@example.com")).thenReturn(Optional.empty());
 
+        Role defaultRole = new Role();
+        defaultRole.setName("USER");
+        when(authService.getDefaultUserRole()).thenReturn(defaultRole);
+
         String jsonBody = """
-                {
-                  "email": "test@example.com",
-                  "password": "pass123",
-                  "firstName": "John",
-                  "lastName": "Doe"
-                }
-                """;
+            {
+              "email": "test@example.com",
+              "password": "pass123",
+              "firstName": "John",
+              "lastName": "Doe"
+            }
+            """;
 
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -61,9 +62,12 @@ public class AuthControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string("User registered"));
 
-
-        verify(authService).register(any(User.class));
+        verify(authService).register(argThat(user ->
+                user.getEmail().equals("test@example.com") &&
+                        user.getRoles().stream().anyMatch(r -> r.getName().equals("USER"))
+        ));
     }
+
 
     @Test
     void register_emailExists_shouldReturn400() throws Exception {
@@ -94,8 +98,8 @@ public class AuthControllerTest {
 
         when(authService.findByEmail("test@example.com")).thenReturn(Optional.of(mockUser));
         when(authService.checkPassword(any(), eq("pass123"))).thenReturn(true);
-        when(authService.generateAccessToken(any())).thenReturn("access-token");
-        when(authService.generateRefreshToken(any())).thenReturn("refresh-token");
+        when(authService.generateAccessToken(any(User.class))).thenReturn("access-token");
+        when(authService.generateRefreshToken(any(User.class))).thenReturn("refresh-token");
 
         String jsonBody = """
                 {
@@ -136,7 +140,11 @@ public class AuthControllerTest {
     void refreshToken_valid_shouldReturn200() throws Exception {
         when(authService.validateToken(FAKE_TOKEN)).thenReturn(true);
         when(authService.extractEmailFromToken(FAKE_TOKEN)).thenReturn("test@example.com");
-        when(authService.generateAccessToken(any())).thenReturn("new-access-token");
+        when(authService.generateAccessToken(any(User.class))).thenReturn("access-token");
+        when(authService.findByEmail("test@example.com"))
+                .thenReturn(Optional.of(new User()));  // Corrigé
+
+
 
         mockMvc.perform(post("/api/auth/refresh-token")
                         .cookie(new jakarta.servlet.http.Cookie("refresh_token", FAKE_TOKEN)))
