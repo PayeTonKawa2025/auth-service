@@ -38,6 +38,8 @@ public class SecurityConfig {
                         ).permitAll()
                         .requestMatchers("/api/auth/roles/**").hasRole("ADMIN")  // Autorise l'accès aux rôles uniquement pour les ADMIN
                         .requestMatchers("/api/auth/users/*/roles").hasRole("ADMIN")  // Autorise la gestion des rôles utilisateurs uniquement pour les ADMIN
+                        .requestMatchers("/api/auth/users").hasRole("ADMIN")  // Autorise les ADMIN à accéder à la liste des utilisateurs
+
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
