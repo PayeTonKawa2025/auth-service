@@ -80,7 +80,7 @@ jobs:
       - name: Build and analyze on SonarCloud
         run: |
           mvn clean verify -DskipTests=true sonar:sonar \
-            -Dsonar.projectKey=PayeTonKawa2025_clients-api \
+            -Dsonar.projectKey=PayeTonKawa2025_auth-service \
             -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} \
             -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
             -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
