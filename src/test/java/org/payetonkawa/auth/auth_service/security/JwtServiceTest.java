@@ -15,7 +15,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class JwtServiceTest {
+class JwtServiceTest {
 
     private JwtService jwtService;
     private User testUser;

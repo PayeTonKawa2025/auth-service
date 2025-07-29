@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 @WebMvcTest(controllers = AuthController.class)
-public class AuthControllerTest {
+class AuthControllerTest {
 
     private MockMvc mockMvc;
 

@@ -15,7 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(PublicKeyController.class)
-public class PublicKeyControllerTest {
+class PublicKeyControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

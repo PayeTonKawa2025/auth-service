@@ -18,7 +18,7 @@ import static org.mockito.Mockito.*;
 
 @ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
-public class AuthServiceTest {
+class AuthServiceTest {
 
     @Mock private UserRepository repo;
     @Mock private PasswordEncoder encoder;
