@@ -56,4 +56,10 @@ class UserServiceTest {
         when(userRepo.existsById(1L)).thenReturn(true);
         assertTrue(service.delete(1L));
     }
+
+    @Test
+    void delete_shouldReturnFalseIfNotExists() {
+        when(userRepo.existsById(1L)).thenReturn(false);
+        assertFalse(service.delete(1L));
+    }
 }
