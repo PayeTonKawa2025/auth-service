@@ -185,7 +185,31 @@
 					</excludes>
 				</configuration>
 			</plugin>
+
+			<plugin>
+				<groupId>com.google.cloud.tools</groupId>
+				<artifactId>jib-maven-plugin</artifactId>
+				<version>3.4.5</version>
+				<configuration>
+					<container>
+						<mainClass>org.payetonkawa.auth.auth_service.AuthServiceApplication</mainClass>
+					</container>
+					<to>
+						<image>payetonkawa2025/auth_service/auth_service:latest</image>
+						<auth>
+							<username>${env.CI_USERNAME}</username>
+							<password>${env.CI_TOKEN}</password>
+						</auth>
+					</to>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.sonarsource.scanner.maven</groupId>
+				<artifactId>sonar-maven-plugin</artifactId>
+				<version>3.10.0.2594</version>
+			</plugin>
 		</plugins>
+
 	</build>
 	<profiles>
 		<profile>
@@ -200,6 +224,38 @@
 			<properties>
 				<spring-boot.run.profiles>test</spring-boot.run.profiles>
 			</properties>
+		</profile>
+
+		<profile>
+			<id>coverage</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<version>0.8.13</version>
+						<executions>
+							<execution>
+								<id>prepare-agent</id>
+								<goals>
+									<goal>prepare-agent</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>report</id>
+								<goals>
+									<goal>report</goal>
+								</goals>
+								<configuration>
+									<formats>
+										<format>XML</format>
+									</formats>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
 	</profiles>
 
