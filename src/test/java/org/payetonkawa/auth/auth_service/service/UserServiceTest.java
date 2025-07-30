@@ -18,7 +18,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
-public class UserServiceTest {
+class UserServiceTest {
 
     @Mock
     private UserRepository userRepo;
@@ -55,5 +55,11 @@ public class UserServiceTest {
     void delete_shouldDelete() {
         when(userRepo.existsById(1L)).thenReturn(true);
         assertTrue(service.delete(1L));
+    }
+
+    @Test
+    void delete_shouldReturnFalseIfNotExists() {
+        when(userRepo.existsById(1L)).thenReturn(false);
+        assertFalse(service.delete(1L));
     }
 }

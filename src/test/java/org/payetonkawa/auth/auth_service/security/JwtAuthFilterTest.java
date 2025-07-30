@@ -15,7 +15,7 @@ import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class JwtAuthFilterTest {
+class JwtAuthFilterTest {
 
     private JwtService jwtService;
     private JwtAuthFilter filter;

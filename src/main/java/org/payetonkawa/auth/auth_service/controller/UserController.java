@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("api/auth/users")
@@ -52,7 +53,7 @@ public class UserController {
     }
 
     @PutMapping("/{userId}/roles")
-    public ResponseEntity<?> updateUserRoles(
+    public ResponseEntity<String> updateUserRoles(
             @PathVariable Long userId,
             @RequestBody List<String> roleNames) {
         try {
@@ -64,7 +65,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/roles")
-    public ResponseEntity<?> getUserRoles(@PathVariable Long userId) {
+    public ResponseEntity<Set<String>> getUserRoles(@PathVariable Long userId) {
         return ResponseEntity.ok(service.getUserRoles(userId));
     }
 
