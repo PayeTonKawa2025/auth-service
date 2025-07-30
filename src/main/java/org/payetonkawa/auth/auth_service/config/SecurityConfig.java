@@ -26,7 +26,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf(AbstractHttpConfigurer::disable)  // Désactive CSRF pour les API REST puisque nous utilisons des tokens JWT et qu'o est en mode stateless
+                // Désactivation CSRF OK : API REST stateless avec JWT transmis via header Authorization
+                .csrf(AbstractHttpConfigurer::disable)
                 .cors()  // Active la gestion du CORS dans Spring Security (prend la config globale)
                 .and()
                 .authorizeHttpRequests(auth -> auth

@@ -8,7 +8,7 @@ import org.springframework.test.context.ActiveProfiles;
 		classes = AuthServiceApplication.class
 )
 @ActiveProfiles("test")
-public class AuthServiceApplicationTests {
+class AuthServiceApplicationTests {
 
 	@Test
 	void contextLoads() {

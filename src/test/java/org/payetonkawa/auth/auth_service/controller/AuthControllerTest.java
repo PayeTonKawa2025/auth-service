@@ -18,18 +18,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 @WebMvcTest(controllers = AuthController.class)
-public class AuthControllerTest {
+class AuthControllerTest {
 
     private MockMvc mockMvc;
 
     @MockBean
     private AuthService authService;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
-    private final String FAKE_TOKEN = "fakeToken";
+    private final String fakeToken = "fakeToken";
 
     @BeforeEach
     void setup() {
@@ -138,8 +135,8 @@ public class AuthControllerTest {
 
     @Test
     void refreshToken_valid_shouldReturn200() throws Exception {
-        when(authService.validateToken(FAKE_TOKEN)).thenReturn(true);
-        when(authService.extractEmailFromToken(FAKE_TOKEN)).thenReturn("test@example.com");
+        when(authService.validateToken(fakeToken)).thenReturn(true);
+        when(authService.extractEmailFromToken(fakeToken)).thenReturn("test@example.com");
         when(authService.generateAccessToken(any(User.class))).thenReturn("access-token");
         when(authService.findByEmail("test@example.com"))
                 .thenReturn(Optional.of(new User()));  // Corrigé
@@ -147,7 +144,7 @@ public class AuthControllerTest {
 
 
         mockMvc.perform(post("/api/auth/refresh-token")
-                        .cookie(new jakarta.servlet.http.Cookie("refresh_token", FAKE_TOKEN)))
+                        .cookie(new jakarta.servlet.http.Cookie("refresh_token", fakeToken)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(header().exists("Set-Cookie"))
@@ -156,10 +153,10 @@ public class AuthControllerTest {
 
     @Test
     void refreshToken_invalid_shouldReturn400() throws Exception {
-        when(authService.validateToken(FAKE_TOKEN)).thenReturn(false);
+        when(authService.validateToken(fakeToken)).thenReturn(false);
 
         mockMvc.perform(post("/api/auth/refresh-token")
-                        .cookie(new jakarta.servlet.http.Cookie("refresh_token", FAKE_TOKEN)))
+                        .cookie(new jakarta.servlet.http.Cookie("refresh_token", fakeToken)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Invalid refresh token"));
@@ -182,12 +179,12 @@ public class AuthControllerTest {
         mockUser.setFirstName("John");
         mockUser.setLastName("Doe");
 
-        when(authService.validateToken(FAKE_TOKEN)).thenReturn(true);
-        when(authService.extractEmailFromToken(FAKE_TOKEN)).thenReturn("test@example.com");
+        when(authService.validateToken(fakeToken)).thenReturn(true);
+        when(authService.extractEmailFromToken(fakeToken)).thenReturn("test@example.com");
         when(authService.findByEmail("test@example.com")).thenReturn(Optional.of(mockUser));
 
         mockMvc.perform(get("/api/auth/me")
-                        .cookie(new jakarta.servlet.http.Cookie("access_token", FAKE_TOKEN)))
+                        .cookie(new jakarta.servlet.http.Cookie("access_token", fakeToken)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value("test@example.com"))
@@ -197,10 +194,10 @@ public class AuthControllerTest {
 
     @Test
     void me_invalidToken_shouldReturn401() throws Exception {
-        when(authService.validateToken(FAKE_TOKEN)).thenReturn(false);
+        when(authService.validateToken(fakeToken)).thenReturn(false);
 
         mockMvc.perform(get("/api/auth/me")
-                        .cookie(new jakarta.servlet.http.Cookie("access_token", FAKE_TOKEN)))
+                        .cookie(new jakarta.servlet.http.Cookie("access_token", fakeToken)))
                 .andDo(print())
                 .andExpect(status().isUnauthorized());
     }

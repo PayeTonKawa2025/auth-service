@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
 import java.util.Optional;
+import org.slf4j.Logger;
 
 @Configuration
 @RequiredArgsConstructor
@@ -19,6 +19,7 @@ public class AdminInitializer {
     private final RoleRepository roleRepo;
     private final UserRepository userRepo;
     private final PasswordEncoder passwordEncoder;
+    private static final Logger logger = org.slf4j.LoggerFactory.getLogger(AdminInitializer.class);
 
     @Value("${admin.email:}")
     private String adminEmail;
@@ -30,7 +31,7 @@ public class AdminInitializer {
     public Runnable initAdmin() {
         return () -> {
             if (adminEmail.isBlank() || adminPassword.isBlank()) {
-                System.out.println("Admin creation skipped: missing ADMIN_EMAIL or ADMIN_PASSWORD.");
+                logger.warn("Admin creation skipped: missing ADMIN_EMAIL or ADMIN_PASSWORD.");
                 return;
             }
 
@@ -48,9 +49,9 @@ public class AdminInitializer {
                 admin.setLastName("Account");
                 admin.getRoles().add(adminRole);
                 userRepo.save(admin);
-                System.out.println("Admin user created: " + adminEmail);
+                logger.info("Admin user created: {}", adminEmail);
             } else {
-                System.out.println("Admin user already exists: " + adminEmail);
+                logger.info("Admin user already exists: {}", adminEmail);
             }
         };
     }
