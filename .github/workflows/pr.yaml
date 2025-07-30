@@ -1,7 +1,11 @@
 name: Pull Request Workflow
 
 on:
-  pull_request:
+  push:
+    branches:
+      - '**'       # Analyse sur toutes les branches
+  pull_request:     # Analyse sur chaque PR
+  workflow_dispatch: # Lancer manuellement si besoin
 
 jobs:
   build:
