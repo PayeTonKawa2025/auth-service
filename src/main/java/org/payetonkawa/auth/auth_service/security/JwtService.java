@@ -99,7 +99,7 @@ public class JwtService {
             return true;
         } catch (Exception e) {
             // Log the exception if needed
-            Logger.warn("JWT validation failed: " + e.getMessage());
+            Logger.warn("JWT validation failed", e);
             return false;
         }
     }

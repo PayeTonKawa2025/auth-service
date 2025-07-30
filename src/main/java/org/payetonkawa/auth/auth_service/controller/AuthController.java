@@ -25,7 +25,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody @Valid RegisterRequest req) {
+    public ResponseEntity<String> register(@RequestBody @Valid RegisterRequest req) {
         if (authService.findByEmail(req.email()).isPresent()) {
             return ResponseEntity.badRequest().body("Email already exists");
         }
@@ -44,7 +44,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody @Valid LoginRequest req) {
+    public ResponseEntity<String> login(@RequestBody @Valid LoginRequest req) {
         var opt = authService.findByEmail(req.email());
         if (opt.isEmpty() || !authService.checkPassword(opt.get(), req.password())) {
             return ResponseEntity.badRequest().body("Invalid credentials");
@@ -65,7 +65,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<?> refreshToken(@CookieValue(name = "refresh_token", required = false) String token) {
+    public ResponseEntity<String> refreshToken(@CookieValue(name = "refresh_token", required = false) String token) {
         if (token == null || !authService.validateToken(token)) {
             return ResponseEntity.badRequest().body("Invalid refresh token");
         }
@@ -82,7 +82,7 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout() {
+    public ResponseEntity<String> logout() {
         ResponseCookie expiredAccess = ResponseCookie.from("access_token", "")
                 .httpOnly(true).secure(false).sameSite("Strict").path("/").maxAge(0).build();
 
@@ -95,21 +95,20 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<?> me(@CookieValue(name = "access_token", required = false) String token) {
+    public ResponseEntity<UserProfileResponse> me(@CookieValue(name = "access_token", required = false) String token) {
         if (token == null || !authService.validateToken(token)) {
-            return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
+            return ResponseEntity.status(401).build(); // Pas de body, donc pas besoin de Map
         }
 
         String email = authService.extractEmailFromToken(token);
         var optionalUser = authService.findByEmail(email);
 
         if (optionalUser.isEmpty()) {
-            return ResponseEntity.status(404).body(Map.of("error", "User not found"));
+            return ResponseEntity.status(404).build();
         }
 
         User user = optionalUser.get();
 
-        // Gestion du rôle : si plusieurs rôles, prends le premier (à adapter selon le besoin)
         String role = user.getRoles().stream()
                 .findFirst()
                 .map(r -> r.getName())
@@ -125,6 +124,7 @@ public class AuthController {
 
         return ResponseEntity.ok(response);
     }
+
 
 
 }
