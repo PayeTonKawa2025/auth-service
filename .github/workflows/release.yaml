@@ -31,8 +31,9 @@ jobs:
       - name: Generate new tag
         id: get_tag
         run: |
-          latest=$(git tag --sort=-v:refname | head -n 1)
+          latest=$(git tag --sort=-v:refname | tail -n 1)
           echo "Latest tag: $latest"
+
           if [[ -z "$latest" ]]; then
             new_tag="1.0.0"
           else
@@ -40,10 +41,18 @@ jobs:
             major=$(echo "$version" | cut -d. -f1)
             minor=$(echo "$version" | cut -d. -f2)
             patch=$(echo "$version" | cut -d. -f3)
-            patch=$((patch + 1))
-            new_tag="$major.$minor.$patch"
+
+            while true; do
+              patch=$((patch + 1))
+              new_tag="$major.$minor.$patch"
+              if ! git rev-parse "$new_tag" >/dev/null 2>&1; then
+                break
+              fi
+            done
           fi
+
           echo "new_tag=$new_tag" >> "$GITHUB_OUTPUT"
+      
 
       - name: Create and push tag
         run: |
