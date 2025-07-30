@@ -79,6 +79,12 @@ jobs:
           name: jacoco-report
           path: target/site/jacoco
 
+      - name: Debug JaCoCo file presence
+        run: |
+          echo "Listing downloaded JaCoCo report content:"
+          find target/site -type f
+
+
 
       - name: Build and analyze on SonarCloud
         run: |
