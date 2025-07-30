@@ -52,8 +52,12 @@ jobs:
           fi
 
           echo "new_tag=$new_tag" >> "$GITHUB_OUTPUT"
-  
-  
+
+
+      - name: Create and push tag
+        run: |
+          git tag ${{ steps.get_tag.outputs.new_tag }}
+          git push origin ${{ steps.get_tag.outputs.new_tag }}
 
   build-docker:
     name: Build docker image
