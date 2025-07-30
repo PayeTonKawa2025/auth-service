@@ -53,6 +53,7 @@ jobs:
 
           echo "new_tag=$new_tag" >> "$GITHUB_OUTPUT"
   
+  
 
   build-docker:
     name: Build docker image
