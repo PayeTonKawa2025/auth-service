@@ -77,6 +77,12 @@ jobs:
           name: jacoco-report
           path: target/site/jacoco
 
+      - name: Move downloaded JaCoCo report
+        run: |
+          mkdir -p target/site/jacoco
+          mv target/site/jacoco/jacoco.xml target/site/jacoco/jacoco.xml
+
+
       - name: Build and analyze on SonarCloud
         run: |
           mvn clean verify -DskipTests=true sonar:sonar \
