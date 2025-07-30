@@ -51,6 +51,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Ensure full history for SonarQube analysis
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -76,11 +78,6 @@ jobs:
         with:
           name: jacoco-report
           path: target/site/jacoco
-
-      - name: Move downloaded JaCoCo report
-        run: |
-          mkdir -p target/site/jacoco
-          mv target/site/jacoco/jacoco.xml target/site/jacoco/jacoco.xml
 
 
       - name: Build and analyze on SonarCloud
