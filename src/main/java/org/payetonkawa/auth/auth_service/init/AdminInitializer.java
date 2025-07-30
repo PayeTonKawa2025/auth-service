@@ -50,6 +50,7 @@ public class AdminInitializer {
                 admin.getRoles().add(adminRole);
                 userRepo.save(admin);
                 logger.info("Admin user created: {}", adminEmail);
+                logger.info("Please change the default password after first login.");
             } else {
                 logger.info("Admin user already exists: {}", adminEmail);
             }
