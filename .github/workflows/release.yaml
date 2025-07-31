@@ -3,7 +3,7 @@ name: Release Workflow
 on:
   push:
     branches:
-      - develop
+      - main
     paths-ignore:
       - '.github/workflows/**'
       - 'README.md'
