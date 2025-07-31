@@ -43,8 +43,8 @@ jobs:
       - name: Upload JaCoCo report
         uses: actions/upload-artifact@v4
         with:
-            name: jacoco-report
-            path: target/site/jacoco/jacoco.xml
+          name: jacoco-report
+          path: target/site/jacoco/jacoco.xml
 
   sonar:
     name: SonarQube Analysis
