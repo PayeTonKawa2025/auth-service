@@ -19,10 +19,6 @@ public class RoleInitializer {
     }
 
     private void createRoleIfNotExists(String roleName) {
-        roleRepository.findByName(roleName).orElseGet(() -> {
-            Role role = new Role();
-            role.setName(roleName);
-            return roleRepository.save(role);
-        });
+
     }
 }
