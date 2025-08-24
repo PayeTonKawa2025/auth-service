@@ -3,6 +3,7 @@ package org.payetonkawa.auth.auth_service.service;
 import lombok.RequiredArgsConstructor;
 import org.payetonkawa.auth.auth_service.model.Role;
 import org.payetonkawa.auth.auth_service.repository.RoleRepository;
+import org.payetonkawa.auth.auth_service.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -11,6 +12,7 @@ import java.util.List;
 public class RoleService {
 
     private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
 
     public Role createRole(String name) {
         if (roleRepository.findByName(name).isPresent()) {
@@ -37,9 +39,15 @@ public class RoleService {
     }
 
     public void deleteRole(Long id) {
-        if (!roleRepository.existsById(id)) {
-            throw new RuntimeException("Role not found");
+        Role role = getRoleById(id);
+
+        if (userRepository.existsByRoles_Name(role.getName())) {
+            throw new RuntimeException(
+                    "Impossible de supprimer le rôle '" + role.getName() + "' car il est assigné à des utilisateurs."
+            );
         }
+
         roleRepository.deleteById(id);
     }
+
 }

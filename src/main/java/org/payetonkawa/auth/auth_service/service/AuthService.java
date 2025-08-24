@@ -51,4 +51,14 @@ public class AuthService {
     public boolean validateToken(String token) {
         return jwtService.validateToken(token);
     }
+
+    public void save(User user) {
+        repo.save(user);
+    }
+
+    public String encodePassword(String raw) {
+        return encoder.encode(raw);
+    }
+
+
 }

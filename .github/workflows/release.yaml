@@ -87,4 +87,4 @@ jobs:
         run: |
           owner="${{ github.repository_owner }}"
           lower_owner="${owner,,}"
-          mvn compile jib:build -DskipTests -Djib.to.image=ghcr.io/${lower_owner}/orders-api:${{ needs.tag.outputs.new_tag }}
+          mvn compile jib:build -DskipTests -Djib.to.image=ghcr.io/${lower_owner}/auth-service:${{ needs.tag.outputs.new_tag }}

@@ -35,11 +35,12 @@ public class SecurityConfig {
                                 "/api/auth/login",
                                 "/api/auth/register",
                                 "/api/auth/refresh-token",
-                                "/api/auth/logout"
+                                "/api/auth/logout",
+                                "/api/auth/me"
                         ).permitAll()
                         .requestMatchers("/api/auth/roles/**").hasRole("ADMIN")  // Autorise l'accès aux rôles uniquement pour les ADMIN
                         .requestMatchers("/api/auth/users/*/roles").hasRole("ADMIN")  // Autorise la gestion des rôles utilisateurs uniquement pour les ADMIN
-                        .requestMatchers("/api/auth/users").hasRole("ADMIN")  // Autorise les ADMIN à accéder à la liste des utilisateurs
+                        .requestMatchers("/api/auth/users/**").hasRole("ADMIN")  // Autorise les ADMIN à accéder à la liste des utilisateurs
 
                         .anyRequest().authenticated()
                 )

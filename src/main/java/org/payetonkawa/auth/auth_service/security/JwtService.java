@@ -16,8 +16,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.Date;
-import java.util.stream.Collectors;
-
+import java.util.List;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
@@ -63,9 +62,10 @@ public class JwtService {
     }
 
     public String generateAccessToken(User user) {
-        String roles = user.getRoles().stream()
+        List<String> roles = user.getRoles().stream()
                 .map(Role::getName)
-                .collect(Collectors.joining(","));
+                .toList();
+
 
         return Jwts.builder()
                 .setSubject(user.getEmail())
@@ -78,9 +78,9 @@ public class JwtService {
 
 
     public String generateRefreshToken(User user) {
-        String roles = user.getRoles().stream()
+        List<String> roles = user.getRoles().stream()
                 .map(Role::getName)
-                .collect(Collectors.joining(","));
+                .toList();
         return Jwts.builder()
                 .setSubject(user.getEmail())
                 .claim("roles", roles)
