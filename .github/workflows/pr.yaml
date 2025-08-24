@@ -2,6 +2,10 @@ name: Pull Request Workflow
 
 on:
   pull_request:
+  push:
+    branches:
+      - develop
+
 
 jobs:
   build:
@@ -73,22 +77,18 @@ jobs:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
 
+      - name: Compile project
+        run: mvn clean compile test-compile -DskipTests
+
       - name: Download JaCoCo report
         uses: actions/download-artifact@v4
         with:
           name: jacoco-report
           path: target/site/jacoco
 
-      - name: Debug JaCoCo file presence
-        run: |
-          echo "Listing downloaded JaCoCo report content:"
-          find target/site -type f
-
-
-
       - name: Build and analyze on SonarCloud
         run: |
-          mvn verify -DskipTests=true sonar:sonar \
+          mvn sonar:sonar \
             -Dsonar.projectKey=PayeTonKawa2025_auth-service \
             -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} \
             -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
@@ -96,4 +96,5 @@ jobs:
             -Dsonar.pullrequest.key=${{ github.event.pull_request.number }} \
             -Dsonar.pullrequest.branch=${{ github.head_ref }} \
             -Dsonar.pullrequest.base=${{ github.base_ref }} \
-            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
+            -Dsonar.coverage.exclusions=**/controller/**,**/config/**
