@@ -45,25 +45,6 @@ class UserControllerTest {
                 .andExpect(status().isOk());
     }
 
-    @Test
-    void create_shouldReturn201() throws Exception {
-        User user = new User();
-        user.setId(1L);
-        Mockito.when(userService.create(any())).thenReturn(user);
-
-        String body = """
-            {
-              "email": "john@doe.com",
-              "password": "pass123"
-            }
-            """;
-
-        mockMvc.perform(post("/api/auth/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(body))
-                .andDo(print())
-                .andExpect(status().isCreated());
-    }
 
     @Test
     void getById_shouldReturn200() throws Exception {

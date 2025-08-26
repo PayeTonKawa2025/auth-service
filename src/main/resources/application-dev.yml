@@ -19,3 +19,7 @@ auth:
     public-key: classpath:public.pem
     expirationMs: 900000           # 15 minutes
     refreshExpirationMs: 86400000 # 24 heures
+
+security:
+  cookie:
+    secure=false:

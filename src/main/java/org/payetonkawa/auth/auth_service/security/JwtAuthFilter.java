@@ -13,7 +13,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.WebUtils;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 public class JwtAuthFilter extends OncePerRequestFilter {
@@ -38,9 +37,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 Claims claims = jwtService.getAllClaimsFromToken(token);
 
                 String email = claims.getSubject();
-                String rolesString = claims.get("roles", String.class);
+                List<String> roles = claims.get("roles", List.class);
 
-                List<SimpleGrantedAuthority> authorities = Arrays.stream(rolesString.split(","))
+                List<SimpleGrantedAuthority> authorities = roles.stream()
                         .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
                         .toList();
 
