@@ -130,7 +130,7 @@ class AuthControllerTest {
                         .content(jsonBody))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Invalid credentials"));
+                .andExpect(content().string("Identifiants invalides"));
     }
 
     @Test

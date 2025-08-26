@@ -12,6 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -43,7 +45,7 @@ class JwtAuthFilterTest {
 
         Claims claims = new DefaultClaims();
         claims.setSubject("user@example.com");
-        claims.put("roles", "USER,ADMIN");  // Simule 2 rôles.
+        claims.put("roles", List.of("USER", "ADMIN"));
 
         when(jwtService.getAllClaimsFromToken("validToken")).thenReturn(claims);
 

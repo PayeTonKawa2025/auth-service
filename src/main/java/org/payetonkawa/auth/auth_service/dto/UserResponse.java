@@ -1,15 +1,15 @@
 package org.payetonkawa.auth.auth_service.dto;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Set;
 
-public record UserProfileResponse(
+public record UserResponse(
         Long id,
         String email,
-        String firstname,
-        String lastname,
+        String firstName,
+        String lastName,
         String status,             // "ACTIVE" ou "INACTIVE"
         LocalDateTime createdAt,
         LocalDateTime lastLogin,
-        List<String> roles
+        Set<RoleResponse> roles
 ) {}
